@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- resources/mapper/UserMapper.xml -->
+<mapper namespace="com.jiangjing.im.app.bussiness.dao.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.jiangjing.im.app.bussiness.dao.UserEntity">
+        <id column="userId" property="userId" />
+        <result column="username" property="userName" />
+        <result column="password" property="password" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, username, password
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from user where id = #{id}
+    </select>
+
+    <!-- 其他SQL语句 -->
+    <select id="searchUser" resultType="java.lang.String">
+        select user_id from app_user
+        <if test = 'searchType == 1'>
+        where mobile = #{keyWord}
+        </if>
+        <if test = 'searchType == 2'>
+        where user_name = #{keyWord}
+        </if>
+    </select>
+</mapper>

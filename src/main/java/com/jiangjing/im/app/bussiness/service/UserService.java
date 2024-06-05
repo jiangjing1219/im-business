@@ -24,4 +24,7 @@ public interface UserService {
      * @return
      */
     ResponseVO<UserEntity> registerUser(RegisterReq req);
+
+
+    void updateNameById(String name);
 }

@@ -1,6 +1,7 @@
 package com.jiangjing.im.app.bussiness.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiangjing.im.app.bussiness.common.ResponseVO;
 import com.jiangjing.im.app.bussiness.dao.UserEntity;
 import com.jiangjing.im.app.bussiness.dao.mapper.UserMapper;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -20,7 +20,7 @@ import java.util.Collections;
  */
 @Transactional
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService {
 
     @Autowired
     UserMapper userMapper;
@@ -62,5 +62,18 @@ public class UserServiceImpl implements UserService {
         // 2、调用 Im 服务
         ResponseVO responseVO = imService.importUser(Collections.singletonList(user));
         return responseVO;
+    }
+
+    @Override
+    public void updateNameById(String name) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserId("324431782084609");
+        userEntity.setUserName(name);
+        userMapper.updateById(userEntity);
+        test();
+    }
+
+    public void test() {
+        System.out.println(1 / 0);
     }
 }

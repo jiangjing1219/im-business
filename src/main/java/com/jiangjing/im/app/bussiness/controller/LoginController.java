@@ -4,6 +4,7 @@ import com.jiangjing.im.app.bussiness.common.ResponseVO;
 import com.jiangjing.im.app.bussiness.model.req.LoginReq;
 import com.jiangjing.im.app.bussiness.model.req.RegisterReq;
 import com.jiangjing.im.app.bussiness.service.LoginService;
+import com.jiangjing.im.app.bussiness.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,9 @@ public class LoginController {
 
     @Autowired
     LoginService loginService;
+
+    @Autowired
+    UserService userService;
 
     /**
      * app 业务系统的登录接口，最重要的就是获取
@@ -46,4 +50,9 @@ public class LoginController {
         return loginService.register(req);
     }
 
+    @RequestMapping("/test")
+    public String test(String name) {
+        userService.updateNameById(name);
+        return "success";
+    }
 }

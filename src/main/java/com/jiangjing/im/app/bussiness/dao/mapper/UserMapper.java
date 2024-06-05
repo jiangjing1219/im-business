@@ -14,16 +14,6 @@ import java.util.List;
 @Mapper
 public interface UserMapper extends BaseMapper<UserEntity> {
 
-
-    @Select("<script>" +
-            " select user_id from app_user  " +
-            "<if test = 'searchType == 1'> " +
-            " where mobile = #{keyWord} " +
-            " </if>" +
-            " <if test = 'searchType == 2'> " +
-            "  where user_name = #{keyWord} " +
-            " </if> " +
-            " </script> ")
-    public List<String> searchUser(SearchUserReq req);
+     List<String> searchUser(SearchUserReq req);
 
 }

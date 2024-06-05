@@ -9,8 +9,8 @@ import com.jiangjing.im.app.bussiness.utils.HttpRequestUtils;
 import com.jiangjing.im.app.bussiness.utils.SigAPI;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author
  */
 @Service
+@Transactional
 public class ImService implements InitializingBean {
 
     @Autowired
@@ -33,7 +34,7 @@ public class ImService implements InitializingBean {
 
     public volatile static Map<String, Object> parameter;
 
-    public volatile static Object lock = new Object();
+    public static final Object lock = new Object();
 
     public ResponseVO importUser(List<UserEntity> userEntities) {
         ImportUserProto proto = new ImportUserProto();
