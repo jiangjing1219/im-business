@@ -1,5 +1,7 @@
 package com.jiangjing.im.app.bussiness.service.impl;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.stp.StpUtil;
 import com.jiangjing.im.app.bussiness.common.ResponseVO;
 import com.jiangjing.im.app.bussiness.config.AppConfig;
 import com.jiangjing.im.app.bussiness.dao.UserEntity;
@@ -51,13 +53,18 @@ public class LoginServiceImpl implements LoginService {
             if (!user.getPassword().equals(req.getPassword())) {
                 return ResponseVO.successResponse(ErrorCode.USERNAME_OR_PASSWORD_ERROR);
             }
+
+            //satoken登录认证
+            StpUtil.login(10001);
+
             // 3、生成 Im Server 的鉴权票据
             SigAPI sigAPI = new SigAPI(appConfig.getAppId(), appConfig.getPrivateKey());
             String imUserSig = sigAPI.genUserSig(user.getUserId(), 500000);
             loginResp.setImUserSign(imUserSig);
             loginResp.setUserId(user.getUserId());
             loginResp.setAppId(appConfig.getAppId());
-            loginResp.setUserSign("app_user_sign");
+            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+            loginResp.setTokenInfo(tokenInfo);
         } else {
             return ResponseVO.successResponse(ErrorCode.USERNAME_OR_PASSWORD_ERROR);
         }
