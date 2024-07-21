@@ -1,5 +1,6 @@
 package com.jiangjing.im.app.bussiness.model.resp;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
 import lombok.Data;
 
 /**
@@ -12,8 +13,8 @@ public class LoginResp {
     //im的token
     private String imUserSign;
 
-    //自己的token
-    private String userSign;
+    //登录的token信息
+    private SaTokenInfo tokenInfo;
 
     private String userId;
 
