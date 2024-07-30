@@ -42,6 +42,7 @@ public class ImService implements InitializingBean {
         userEntities.forEach(userEntity -> {
             ImportUserProto.UserData user = new ImportUserProto.UserData();
             user.setUserId(userEntity.getUserId());
+            user.setNickName(userEntity.getUserName());
             user.setUserType(1);
             userData.add(user);
         });

@@ -48,10 +48,10 @@ public class LoginServiceImpl implements LoginService {
             // 2、查询该用户的信息
             UserEntity user = userService.getUserByUserName(req.getUserName());
             if (user == null) {
-                return ResponseVO.successResponse(ErrorCode.USER_NOT_EXIST);
+                return ResponseVO.errorResponse(ErrorCode.USER_NOT_EXIST);
             }
             if (!user.getPassword().equals(req.getPassword())) {
-                return ResponseVO.successResponse(ErrorCode.USERNAME_OR_PASSWORD_ERROR);
+                return ResponseVO.errorResponse(ErrorCode.USERNAME_OR_PASSWORD_ERROR);
             }
 
             //satoken登录认证
@@ -66,7 +66,7 @@ public class LoginServiceImpl implements LoginService {
             SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
             loginResp.setTokenInfo(tokenInfo);
         } else {
-            return ResponseVO.successResponse(ErrorCode.USERNAME_OR_PASSWORD_ERROR);
+            return ResponseVO.errorResponse(ErrorCode.USERNAME_OR_PASSWORD_ERROR);
         }
         return ResponseVO.successResponse(loginResp);
     }

@@ -13,7 +13,7 @@ public enum ErrorCode implements ApplicationExceptionEnum {
     USERNAME_OR_PASSWORD_ERROR(10001,"用户名或密码错误"),
     MOBILE_IS_REGISTER(10002,"该手机号已注册了用户"),
 
-    REGISTER_ERROR(10003,"注册失败"),
+    REGISTER_ERROR(10003,"注册失败，该用户名已经存在"),
 
     REPORT_TAG_IS_NOT_EXIST(10004,"举报标签不存在"),
 
