@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.jjiangjing</groupId>
     <artifactId>im-app-business</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>im-app-bussiness</name>
     <description>im-app-bussiness</description>
     <properties>
@@ -123,6 +123,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
             <version>2.12.0</version>
+        </dependency>
+
+        <!-- Spring Boot Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
 
