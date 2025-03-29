@@ -1,7 +1,6 @@
 package com.jiangjing.im.app.bussiness.service.impl;
 
-import cn.dev33.satoken.stp.SaTokenInfo;
-import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.json.JSONUtil;
 import com.jiangjing.im.app.bussiness.common.ResponseVO;
 import com.jiangjing.im.app.bussiness.config.AppConfig;
 import com.jiangjing.im.app.bussiness.dao.UserEntity;
@@ -11,11 +10,19 @@ import com.jiangjing.im.app.bussiness.enums.RegisterTypeEnum;
 import com.jiangjing.im.app.bussiness.model.req.LoginReq;
 import com.jiangjing.im.app.bussiness.model.req.RegisterReq;
 import com.jiangjing.im.app.bussiness.model.resp.LoginResp;
+import com.jiangjing.im.app.bussiness.security.ImUserDetails;
 import com.jiangjing.im.app.bussiness.service.LoginService;
 import com.jiangjing.im.app.bussiness.service.UserService;
-import com.jiangjing.im.app.bussiness.utils.SigAPI;
+import com.jiangjing.im.common.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -31,6 +38,9 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     AppConfig appConfig;
 
+    @Autowired
+    AuthenticationManager authenticationManager;
+
     /**
      * 用户登录接口，登录类型：
      * 1、username  - password
@@ -41,30 +51,34 @@ public class LoginServiceImpl implements LoginService {
      * @return
      */
     @Override
+    @Transactional(propagation = Propagation.NEVER)
     public ResponseVO login(LoginReq req) {
         LoginResp loginResp = new LoginResp();
         // 1、判断登录类型，根据登录类型处理
         if (req.getLoginType() == LoginTypeEnum.USERNAME_PASSWORD.getCode()) {
-            // 2、查询该用户的信息
-            UserEntity user = userService.getUserByUserName(req.getUserName());
-            if (user == null) {
-                return ResponseVO.errorResponse(ErrorCode.USER_NOT_EXIST);
+            // 使用 Spring Security 验证
+            UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(req.getUserName(),
+                    req.getPassword());
+            try {
+                Authentication authentication = authenticationManager.authenticate(authRequest);
+                if (authentication.isAuthenticated()) {
+                    // 认证成功，返回认证结果，放入安全上下文中
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    UserEntity user = userService.getUserByUserName(req.getUserName());
+                    // jwt 生成 token 刷新
+                    ImUserDetails principal = (ImUserDetails) authentication.getPrincipal();
+                    String accessToken = JWTUtil.create(user.getUserId(), user.getUserName(), JSONUtil.toJsonStr(principal),5);
+                    String refreshToken = JWTUtil.create(user.getUserId(), user.getUserName(), JSONUtil.toJsonStr(principal),60 * 15);
+                    loginResp.setUserId(user.getUserId());
+                    loginResp.setAppId(appConfig.getAppId());
+                    loginResp.setAccessToken(accessToken);
+                    loginResp.setRefreshToken(refreshToken);
+                }else {
+                    return ResponseVO.errorResponse(403, "认证失败");
+                }
+            } catch (AuthenticationException e) {
+                return ResponseVO.errorResponse(403, e.getLocalizedMessage());
             }
-            if (!user.getPassword().equals(req.getPassword())) {
-                return ResponseVO.errorResponse(ErrorCode.USERNAME_OR_PASSWORD_ERROR);
-            }
-
-            //satoken登录认证
-            StpUtil.login(10001);
-
-            // 3、生成 Im Server 的鉴权票据
-            SigAPI sigAPI = new SigAPI(appConfig.getAppId(), appConfig.getPrivateKey());
-            String imUserSig = sigAPI.genUserSig(user.getUserId(), 500000);
-            loginResp.setImUserSign(imUserSig);
-            loginResp.setUserId(user.getUserId());
-            loginResp.setAppId(appConfig.getAppId());
-            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
-            loginResp.setTokenInfo(tokenInfo);
         } else {
             return ResponseVO.errorResponse(ErrorCode.USERNAME_OR_PASSWORD_ERROR);
         }

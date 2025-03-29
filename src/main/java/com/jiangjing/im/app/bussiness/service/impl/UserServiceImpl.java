@@ -6,21 +6,25 @@ import com.jiangjing.im.app.bussiness.common.ResponseVO;
 import com.jiangjing.im.app.bussiness.dao.UserEntity;
 import com.jiangjing.im.app.bussiness.dao.mapper.UserMapper;
 import com.jiangjing.im.app.bussiness.model.req.RegisterReq;
+import com.jiangjing.im.app.bussiness.security.ImUserDetails;
 import com.jiangjing.im.app.bussiness.service.ImService;
 import com.jiangjing.im.app.bussiness.service.UserService;
 import com.jiangjing.im.app.bussiness.utils.SnowflakeIdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * @author Admin
  */
 @Transactional
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService, UserDetailsService, UserDetailsPasswordService {
 
     @Autowired
     UserMapper userMapper;
@@ -60,8 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         user.setUserId(String.valueOf(snowflakeIdWorker.nextId()));
         userMapper.insert(user);
         // 2、调用 Im 服务
-        ResponseVO responseVO = imService.importUser(Collections.singletonList(user));
-        return responseVO;
+        return imService.importUser(Collections.singletonList(user));
     }
 
     @Override
@@ -75,5 +78,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     public void test() {
         System.out.println(1 / 0);
+    }
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity user = this.getUserByUserName(username);;
+        if (Objects.isNull(user)) {
+            //说明用户名不存在
+            throw new UsernameNotFoundException("账户不存在");
+        }
+        user.getRoles().add("admin");
+        return new ImUserDetails(user);
+    }
+
+    @Transactional(propagation = Propagation.NEVER)
+    @Override
+    public UserDetails updatePassword(UserDetails user, String newPassword) {
+        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name", user.getUsername());
+        UserEntity userEntity = new UserEntity();
+        userEntity.setPassword(newPassword);
+        userMapper.update(userEntity, queryWrapper);
+        return user;
     }
 }

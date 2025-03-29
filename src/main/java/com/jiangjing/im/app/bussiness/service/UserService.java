@@ -12,7 +12,6 @@ public interface UserService {
      * 根据用户名和密码查询用户
      *
      * @param userName
-     * @param password
      * @return
      */
     UserEntity getUserByUserName(String userName);

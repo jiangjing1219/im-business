@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jiangjing.im.app.bussiness.dao.UserEntity;
 import com.jiangjing.im.app.bussiness.model.req.SearchUserReq;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 

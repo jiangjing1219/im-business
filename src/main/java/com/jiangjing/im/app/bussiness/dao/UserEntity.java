@@ -1,8 +1,12 @@
 package com.jiangjing.im.app.bussiness.dao;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author: Chackylee
@@ -24,5 +28,8 @@ public class UserEntity {
     private Long createTime;
     //更新时间
     private Long updateTime;
+
+    @TableField(exist = false)
+    private Set<String> roles = new HashSet<>();
 
 }

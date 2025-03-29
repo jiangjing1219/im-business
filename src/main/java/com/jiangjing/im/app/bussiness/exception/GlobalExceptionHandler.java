@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         ResponseVO resultBean = new ResponseVO();
         resultBean.setCode(BaseErrorCode.SYSTEM_ERROR.getCode());
-        resultBean.setMsg(BaseErrorCode.SYSTEM_ERROR.getError());
+        resultBean.setMsg(e.getLocalizedMessage());
         /**
          * 未知异常的话，这里写逻辑，发邮件，发短信都可以、、
          */

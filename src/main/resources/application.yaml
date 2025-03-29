@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: im-app-business
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://127.0.0.1:3306/im?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
+  security:
+    user:
+      name: root
+      password: root
+    oauth2:
+      client:
+        registration:
+          gitee:
+            client-id: 929327fd8b0d1fba997a1a475d44d8818b121ac23146cd7012e5984992f30f12
+            client-secret: 786688a091e67691f8080c9e3552d9bd9d03fa5d3b84d4f726da0cc839d901e9
+            authorization-grant-type: authorization_code
+            # 回调地址要求：OAuth2LoginAuthenticationFilter 要求拦截路径为 /login/oauth2/code/*
+            redirect-uri: http://localhost:8301/login/oauth2/code/gitee
+            scope:
+              - user_info
+              - projects
+              - pull_requests
+              - issues
+              - emails
+        provider:
+          gitee:
+            authorization-uri: https://gitee.com/oauth/authorize
+            token-uri: https://gitee.com/oauth/token
+            user-info-uri: https://gitee.com/api/v5/user
+            user-name-attribute: username
+
+server:
+  port: 8301
+  servlet:
+    context-path: /app-business
+
+appConfig:
+  imUrl: http://127.0.0.1:8000
+  imVersion: v1
+  appId: 10000
+  adminId: admin
+  privateKey: '123456'
+
+httpclient:
+  maxTotal: 100
+  defaultMaxPerRoute: 50
+  connectTimeout: 2000
+  connectionRequestTimeout: 2000
+  socketTimeout: 5000
+  staleConnectionCheckEnabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml

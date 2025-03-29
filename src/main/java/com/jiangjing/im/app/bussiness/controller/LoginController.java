@@ -12,6 +12,7 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.JsonUtils;
 import com.jiangjing.im.app.bussiness.common.ResponseVO;
 import com.jiangjing.im.app.bussiness.config.PooledDashScopeObjectFactory;
+import com.jiangjing.im.app.bussiness.dao.UserEntity;
 import com.jiangjing.im.app.bussiness.model.req.LoginReq;
 import com.jiangjing.im.app.bussiness.model.req.RegisterReq;
 import com.jiangjing.im.app.bussiness.service.LoginService;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
@@ -66,6 +68,12 @@ public class LoginController {
     @RequestMapping("/register")
     public ResponseVO register(@RequestBody @Validated RegisterReq req) {
         return loginService.register(req);
+    }
+
+
+    @RequestMapping("/getUser")
+    public UserEntity getUser(@RequestParam String username) {
+        return userService.getUserByUserName(username);
     }
 
     public static void streamCallWithMessage()
