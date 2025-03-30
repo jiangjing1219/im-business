@@ -1,11 +1,12 @@
 package com.jiangjing.im.app.bussiness.security.filter;
 
 import cn.hutool.core.exceptions.ValidateException;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.jwt.JWTException;
 import cn.hutool.jwt.JWTValidator;
 import cn.hutool.jwt.signers.JWTSignerUtil;
 import com.jiangjing.im.app.bussiness.security.ImUserDetails;
+import com.jiangjing.im.common.utils.JWTUtil;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,9 +18,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.jiangjing.im.common.utils.JWTUtil;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -54,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             JWTValidator.of(token)
                     .validateAlgorithm(JWTSignerUtil.hs256(JWTUtil.PRIVATE_KEY));
-        } catch (ValidateException e) {
+        } catch (ValidateException | JWTException e) {
             // 令牌非法，需要返回 403
             throw new BadCredentialsException("token is bad");
         }
@@ -75,8 +73,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isSkipCheck(HttpServletRequest request) {
         return Arrays.asList(
-                "/app-business/v1/login",
-                "/public/**"
+                "/v1/register",
+                "/v1/login",
+                "/login/oauth2/code/gitee",
+                "/v1/login/oauth2/success",
+                "/v1/login/oauth2/failure",
+                "/oauth2/authorization/gitee"
         ).contains(request.getRequestURI());
     }
 }

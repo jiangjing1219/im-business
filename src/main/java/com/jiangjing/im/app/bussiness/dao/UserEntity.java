@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,5 +32,20 @@ public class UserEntity {
 
     @TableField(exist = false)
     private Set<String> roles = new HashSet<>();
+
+    // 三方登录id
+    private String uniqueId;
+    // 三方登录账号
+    private String login;
+    // 三方登录昵称
+    private String name;
+    // 三方登录头像
+    private String avatarUrl;
+    // 三方登录凭证
+    private String credentials;
+    // 三方登录凭证过期时间
+    private Long credentialsExpiresAt;
+    // 三方登录注册渠道
+    private String registrationId;
 
 }
