@@ -12,6 +12,10 @@ public enum RegisterTypeEnum {
     USERNAME(1),
 
     MOBILE(2),
+
+    GITEE(3),
+
+    GITHUB(4);
     ;
 
     private int code;

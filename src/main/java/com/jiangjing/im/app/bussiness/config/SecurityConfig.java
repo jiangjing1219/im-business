@@ -1,18 +1,25 @@
 package com.jiangjing.im.app.bussiness.config;
 
+import cn.hutool.json.JSONUtil;
+import com.jiangjing.im.app.bussiness.dao.UserEntity;
+import com.jiangjing.im.app.bussiness.security.ImUserDetails;
 import com.jiangjing.im.app.bussiness.security.filter.JwtAuthenticationFilter;
 import com.jiangjing.im.app.bussiness.security.handler.JwtAccessDeniedHandler;
 import com.jiangjing.im.app.bussiness.security.handler.JwtAuthenticationEntryPoint;
+import com.jiangjing.im.common.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
 @Configuration
@@ -47,6 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin().disable();
         http.httpBasic().disable();
         http.csrf().disable();
+        http.cors(Customizer.withDefaults());
         http.addFilterBefore(jwtAuthenticationFilter, FilterSecurityInterceptor.class);
         http.exceptionHandling(handler -> {
             handler.authenticationEntryPoint(new JwtAuthenticationEntryPoint());
@@ -76,12 +84,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         })
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(userService))
                         .successHandler((request, response, authentication) -> {
-                            // 登录成功后的处理逻辑
-                            response.sendRedirect("/v1/login/oauth2/success");
+                            // 用户授权成功后回调，完成登录
+                            String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
+                            String accessToken = "";
+                            if ("gitee".equals(registrationId)) {
+                                // 生成 jwt token
+                                OAuth2User principal = ((OAuth2AuthenticationToken) authentication).getPrincipal();
+                                Integer uniqueId = principal.getAttribute("id");
+                                String name = principal.getAttribute("name");
+                                UserEntity userEntity = new UserEntity();
+                                userEntity.setUniqueId(String.valueOf(uniqueId));
+                                userEntity.setUserName(name);
+                                ImUserDetails imUserDetails = new ImUserDetails(userEntity);
+                                accessToken = JWTUtil.create(String.valueOf(uniqueId), name, JSONUtil.toJsonStr(imUserDetails), 60 * 60);
+                            }
+                            // 最终跳转到登录页面，返回 access_token
+                            response.sendRedirect("http://127.0.0.1:8080/login?access_token=" + accessToken);
                         })
                         .failureHandler((request, response, authentication) -> {
-                            // 登录成功后的处理逻辑
-                            response.sendRedirect("/v1/login/oauth2/failure");
+                            // 用户授权取消，直接跳转回登录页面
+                            response.sendRedirect("http://127.0.0.1:8080/login");
                         })
         );
     }

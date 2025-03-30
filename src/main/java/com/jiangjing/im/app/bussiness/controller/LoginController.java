@@ -55,6 +55,11 @@ public class LoginController {
         return loginService.login(req);
     }
 
+    @RequestMapping("/thirdLogin")
+    public ResponseVO thirdLogin() {
+        return loginService.thirdLogin();
+    }
+
     /**
      * 注册，在业务完成注册，同时也需要同步到 Im 服务端，问题
      *

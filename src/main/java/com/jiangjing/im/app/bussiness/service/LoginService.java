@@ -23,4 +23,10 @@ public interface LoginService {
      * @return
      */
     ResponseVO register(RegisterReq req);
+
+    /**
+     * 第三方登录
+     * @return
+     */
+    ResponseVO thirdLogin();
 }

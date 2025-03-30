@@ -1,9 +1,11 @@
 package com.jiangjing.im.app.bussiness.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jiangjing.im.app.bussiness.common.ResponseVO;
 import com.jiangjing.im.app.bussiness.config.AppConfig;
 import com.jiangjing.im.app.bussiness.dao.UserEntity;
+import com.jiangjing.im.app.bussiness.dao.mapper.UserMapper;
 import com.jiangjing.im.app.bussiness.enums.ErrorCode;
 import com.jiangjing.im.app.bussiness.enums.LoginTypeEnum;
 import com.jiangjing.im.app.bussiness.enums.RegisterTypeEnum;
@@ -33,6 +35,9 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    UserMapper userMapper;
 
     @Autowired
     AppConfig appConfig;
@@ -102,5 +107,25 @@ public class LoginServiceImpl implements LoginService {
             return userResponseVO;
         }
         return ResponseVO.successResponse();
+    }
+
+    /**
+     * 第三方登录，根据 registrationId 获取第三方用户信息
+     * @return
+     */
+    @Override
+    public ResponseVO thirdLogin() {
+        LoginResp loginResp = new LoginResp();
+        ImUserDetails principal = (ImUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        QueryWrapper<UserEntity> userEntityQueryWrapper = new QueryWrapper<>();
+        userEntityQueryWrapper.eq("unique_id", principal.getUser().getUniqueId());
+        UserEntity userEntity = userMapper.selectOne(userEntityQueryWrapper);
+        String accessToken = JWTUtil.create(userEntity.getUserId(), userEntity.getUserName(), JSONUtil.toJsonStr(principal),5);
+        String refreshToken = JWTUtil.create(userEntity.getUserId(), userEntity.getUserName(), JSONUtil.toJsonStr(principal),60 * 15);
+        loginResp.setUserId(userEntity.getUserId());
+        loginResp.setAppId(appConfig.getAppId());
+        loginResp.setAccessToken(accessToken);
+        loginResp.setRefreshToken(refreshToken);
+        return ResponseVO.successResponse(loginResp);
     }
 }
