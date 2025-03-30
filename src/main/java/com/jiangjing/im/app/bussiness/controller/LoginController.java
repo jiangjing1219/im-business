@@ -11,15 +11,12 @@ import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.JsonUtils;
 import com.jiangjing.im.app.bussiness.common.ResponseVO;
-import com.jiangjing.im.app.bussiness.config.PooledDashScopeObjectFactory;
 import com.jiangjing.im.app.bussiness.dao.UserEntity;
 import com.jiangjing.im.app.bussiness.model.req.LoginReq;
 import com.jiangjing.im.app.bussiness.model.req.RegisterReq;
 import com.jiangjing.im.app.bussiness.service.LoginService;
 import com.jiangjing.im.app.bussiness.service.UserService;
 import io.reactivex.Flowable;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.Semaphore;
 
 /**

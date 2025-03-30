@@ -4,7 +4,6 @@ import com.jiangjing.im.app.bussiness.common.ResponseVO;
 import com.jiangjing.im.app.bussiness.model.resp.LoginResp;
 import com.jiangjing.im.app.bussiness.security.ImUserDetails;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
