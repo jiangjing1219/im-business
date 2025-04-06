@@ -14,9 +14,16 @@ import java.util.Objects;
 /**
  * gitee OAuth2 用户信息转换器
  */
-public class GiteeUserConverter {
+public class ThirdUserConverter {
 
-    public static UserEntity convert(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
+    /**
+     * gitee OAuth2 用户信息转换器
+     *
+     * @param oAuth2UserRequest
+     * @param oAuth2User
+     * @return
+     */
+    public static UserEntity giteeConvert(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         UserEntity userEntity = new UserEntity();
         Map<String, Object> attributes = oAuth2User.getAttributes();
         userEntity.setUniqueId(String.valueOf(attributes.get("id")));
@@ -27,7 +34,25 @@ public class GiteeUserConverter {
         userEntity.setUserName((String) attributes.get("remark"));
         OAuth2AccessToken accessToken = oAuth2UserRequest.getAccessToken();
         userEntity.setCredentials(accessToken.getTokenValue());
+        //expiresAt默认采用isO8601标准时间格式（使用零时区）
+        ZonedDateTime zonedDateTime = Objects.requireNonNull(accessToken.getExpiresAt()).atZone(ZoneId.systemDefault());
+        userEntity.setCredentialsExpiresAt(Date.from(zonedDateTime.toInstant()).getTime());
+        userEntity.setCreateTime(new Date().getTime());
+        userEntity.setUpdateTime(new Date().getTime());
+        return userEntity;
+    }
 
+    public static UserEntity githubConvert(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
+        UserEntity userEntity = new UserEntity();
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        userEntity.setUniqueId(String.valueOf(attributes.get("id")));
+        userEntity.setLogin((String) attributes.get("login"));
+        userEntity.setName((String) attributes.get("name"));
+        userEntity.setAvatarUrl((String) attributes.get("avatar_url"));
+        userEntity.setRegistrationId("github");
+        userEntity.setUserName((String) attributes.get("login"));
+        OAuth2AccessToken accessToken = oAuth2UserRequest.getAccessToken();
+        userEntity.setCredentials(accessToken.getTokenValue());
         //expiresAt默认采用isO8601标准时间格式（使用零时区）
         ZonedDateTime zonedDateTime = Objects.requireNonNull(accessToken.getExpiresAt()).atZone(ZoneId.systemDefault());
         userEntity.setCredentialsExpiresAt(Date.from(zonedDateTime.toInstant()).getTime());

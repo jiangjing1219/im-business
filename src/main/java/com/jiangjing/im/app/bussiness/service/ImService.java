@@ -44,6 +44,7 @@ public class ImService implements InitializingBean {
             user.setUserId(userEntity.getUserId());
             user.setNickName(userEntity.getUserName());
             user.setUserType(1);
+            user.setPhoto(userEntity.getAvatarUrl());
             userData.add(user);
         });
         String uri = "/user/importUser";

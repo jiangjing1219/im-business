@@ -86,24 +86,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .successHandler((request, response, authentication) -> {
                             // 用户授权成功后回调，完成登录
                             String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
-                            String accessToken = "";
-                            if ("gitee".equals(registrationId)) {
-                                // 生成 jwt token
-                                OAuth2User principal = ((OAuth2AuthenticationToken) authentication).getPrincipal();
-                                Integer uniqueId = principal.getAttribute("id");
-                                String name = principal.getAttribute("name");
-                                UserEntity userEntity = new UserEntity();
-                                userEntity.setUniqueId(String.valueOf(uniqueId));
-                                userEntity.setUserName(name);
-                                ImUserDetails imUserDetails = new ImUserDetails(userEntity);
-                                accessToken = JWTUtil.create(String.valueOf(uniqueId), name, JSONUtil.toJsonStr(imUserDetails), 60 * 60);
-                            }
+                            // 生成 jwt token
+                            OAuth2User principal = ((OAuth2AuthenticationToken) authentication).getPrincipal();
+                            Integer uniqueId = principal.getAttribute("id");
+                            String name = principal.getAttribute("name");
+                            UserEntity userEntity = new UserEntity();
+                            userEntity.setUniqueId(String.valueOf(uniqueId));
+                            userEntity.setUserName(name);
+                            userEntity.setRegistrationId(registrationId);
+                            ImUserDetails imUserDetails = new ImUserDetails(userEntity);
+                            /* 只有 60s 的有效期，换取登录的 token */
+                            String accessToken = JWTUtil.create(String.valueOf(uniqueId), name, JSONUtil.toJsonStr(imUserDetails), 60);
+
                             // 最终跳转到登录页面，返回 access_token
-                            response.sendRedirect("http://127.0.0.1:8080/login?access_token=" + accessToken);
+                            response.sendRedirect("http://192.168.1.2:8080/login?access_token=" + accessToken);
                         })
                         .failureHandler((request, response, authentication) -> {
                             // 用户授权取消，直接跳转回登录页面
-                            response.sendRedirect("http://127.0.0.1:8080/login");
+                            response.sendRedirect("http://192.168.1.2:8080/login");
                         })
         );
     }
