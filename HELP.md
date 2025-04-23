@@ -11,8 +11,9 @@ module.exports = defineConfig({
 ```
 ### 1.2、前台资源存放目录
 `D:/vue-projects` 目录下存放项目资源，项目资源目录结构如下：
-![img.png](img.png)
-样例vue3项目静态资源文件：[dist.rar](..%2F..%2Fvue-projects%2Fproject1%2Fdist.rar)
+![img](https://github.com/user-attachments/assets/37f1b090-7113-47c7-b96e-95fefc130408)
+
+样例vue3项目静态资源文件：
 
 ## 2、Spring Boot 配置
 ### 2.1、映射静态资源
@@ -90,4 +91,5 @@ public class CallbackController {
         </dependency>
 ```
 ### 验证
-![img_1.png](img_1.png)
+![img_1](https://github.com/user-attachments/assets/997d41a6-4d96-4191-ad35-c2733af8a26b)
+
